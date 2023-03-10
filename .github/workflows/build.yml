@@ -121,8 +121,3 @@ jobs:
           cd /tmp/project && \
           npm install --ignore-scripts && \
           npx --no-install prebuild -r node -t 14.0.0 -t 16.0.0 -t 18.0.0 --include-regex 'better_sqlite3.node$' -u ${{ secrets.GITHUB_TOKEN }}"
-      - run: |
-          docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} node:16 -c "\
-          cd /tmp/project && \
-          npm install --ignore-scripts && \
-          npx --no-install prebuild -r electron -t 14.0.0 -t 16.0.0 -t 18.0.0 --include-regex 'better_sqlite3.node$' -u ${{ secrets.GITHUB_TOKEN }}"
