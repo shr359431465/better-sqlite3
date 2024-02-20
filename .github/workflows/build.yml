@@ -134,4 +134,4 @@ jobs:
           docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} node:16 -c "\
           cd /tmp/project && \
           npm install --ignore-scripts && \
-          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GITHUB_TOKEN }}"
+          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.ACCESS_TOKEN }}"
