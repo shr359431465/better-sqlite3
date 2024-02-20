@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-18.04
           # - macos-latest
           # - windows-2019
         node:
@@ -31,8 +31,8 @@ jobs:
     name: Testing Node ${{ matrix.node }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       # - if: ${{ startsWith(matrix.os, 'windows') }}
@@ -62,7 +62,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-18.04
           # - macos-latest
           # - macos-14
           # - windows-2019
@@ -70,8 +70,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: publish
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
       # - if: ${{ startsWith(matrix.os, 'windows') }}
@@ -125,10 +125,10 @@ jobs:
           # - arm/v7
           - arm64
     name: Prebuild on Linux (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: publish
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
       - run: |
           docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} node:16 -c "\
