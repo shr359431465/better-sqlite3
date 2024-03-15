@@ -26,31 +26,19 @@ public:
 	}
 
 private:
-
 	struct Result {
 		int count;
 		bool bound_object;
 	};
 
-#hdr
-	static bool IsPlainObject(v8::Isolate* isolate, v8::Local<v8::Object> obj);
-#end
-#src
 	static bool IsPlainObject(v8::Isolate* isolate, v8::Local<v8::Object> obj) {
 		v8::Local<v8::Value> proto = obj->GetPrototype();
-
-		#if defined NODE_MODULE_VERSION && NODE_MODULE_VERSION < 93
 		v8::Local<v8::Context> ctx = obj->CreationContext();
-		#else
-		v8::Local<v8::Context> ctx = obj->GetCreationContext().ToLocalChecked();
-		#endif
-
 		ctx->Enter();
 		v8::Local<v8::Value> baseProto = v8::Object::New(isolate)->GetPrototype();
 		ctx->Exit();
 		return proto->StrictEquals(baseProto) || proto->StrictEquals(v8::Null(isolate));
 	}
-#end
 
 	void Fail(void (*Throw)(const char* _), const char* message) {
 		assert(success == true);
@@ -95,7 +83,7 @@ private:
 			return 0;
 		}
 		int len = static_cast<int>(length);
-		for (int i = 0; i < len; ++i) {
+		for (int i=0; i<len; ++i) {
 			v8::MaybeLocal<v8::Value> maybeValue = arr->Get(ctx, i);
 			if (maybeValue.IsEmpty()) {
 				Fail(NULL, NULL);
@@ -119,7 +107,7 @@ private:
 		BindMap::Pair* pairs = bind_map->GetPairs();
 		int len = bind_map->GetSize();
 
-		for (int i = 0; i < len; ++i) {
+		for (int i=0; i<len; ++i) {
 			v8::Local<v8::String> key = pairs[i].GetName(isolate);
 
 			// Check if the named parameter was provided.
@@ -130,7 +118,7 @@ private:
 			}
 			if (!has_property.FromJust()) {
 				v8::String::Utf8Value param_name(isolate, key);
-				Fail(ThrowRangeError, (std::string("Missing named parameter \"") + *param_name + "\"").c_str());
+				Fail(ThrowRangeError, CONCAT("Missing named parameter \"", *param_name, "\"").c_str());
 				return i;
 			}
 
@@ -162,17 +150,17 @@ private:
 		int count = 0;
 		bool bound_object = false;
 
-		for (int i = 0; i < argc; ++i) {
+		for (int i=0; i<argc; ++i) {
 			v8::Local<v8::Value> arg = info[i];
 
 			if (arg->IsArray()) {
-				count += BindArray(isolate, arg.As<v8::Array>());
+				count += BindArray(isolate, v8::Local<v8::Array>::Cast(arg));
 				if (!success) break;
 				continue;
 			}
 
 			if (arg->IsObject() && !node::Buffer::HasInstance(arg)) {
-				v8::Local<v8::Object> obj = arg.As<v8::Object>();
+				v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(arg);
 				if (IsPlainObject(isolate, obj)) {
 					if (bound_object) {
 						Fail(ThrowTypeError, "You cannot specify named parameters in two different objects");
@@ -183,9 +171,6 @@ private:
 					count += BindObject(isolate, obj, stmt);
 					if (!success) break;
 					continue;
-				} else if (stmt->GetBindMap(isolate)->GetSize()) {
-					Fail(ThrowTypeError, "Named parameters can only be passed within plain objects");
-					break;
 				}
 			}
 
